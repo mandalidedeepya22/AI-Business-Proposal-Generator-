@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: proposal_db
+    environment:
+      POSTGRES_DB: proposal_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  backend:
+    build: ./backend
+    container_name: proposal_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_URL=${POSTGRES_URL}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PORT=8000
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - API_KEY=${API_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app/backend
+
+  frontend:
+    build: ./frontend
+    container_name: proposal_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

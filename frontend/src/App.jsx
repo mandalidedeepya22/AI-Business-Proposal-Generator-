@@ -22,7 +22,7 @@ export default function App() {
   const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const API_BASE = 'http://localhost:8000';
+  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
 
   const handleLogin = async (e) => {
     e.preventDefault();
